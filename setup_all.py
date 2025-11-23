@@ -134,36 +134,33 @@ def train_models(project_root: Path, printed_npz: Path, handwritten_npz: Path):
 
 
 def generate_test_images(project_root: Path, printed_font: Path, handwritten_font: Path):
+    """Genera imágenes de test para impreso y manuscrito."""
     sys.path.insert(0, str(project_root))
 
     from config import DATA_DIR
-    from generate_test_image import render_text_image
-    from generate_handwritten_test_image import generate_handwritten_test_image
+    from generators.generate_test_image import render_text_image
+    from generators.generate_handwritten_test_image import (
+        generate_handwritten_test_image,
+    )
 
     samples_dir = DATA_DIR / "samples"
     samples_dir.mkdir(parents=True, exist_ok=True)
 
-    printed_img = samples_dir / "setup_printed_test.png"
-    handwritten_img = samples_dir / "setup_handwritten_test.png"
+    printed_img = samples_dir / "test_ocr_setup.png"
+    handwritten_img = samples_dir / "test_handwritten_setup.png"
 
-    print("\n[setup_all] === Generando imagen de test IMPRESA ===")
+    print("\n[setup_all] === Generando imagen de prueba IMPRESA ===")
     render_text_image(
-        text="HOLA ESTO ES UNA PRUEBA DE OCR IMPRESO",
+        text="HOLA ESTO ES UNA PRUEBA DE OCR IMPRESO\nEXAMEN IA",
         font_path=printed_font,
         out_path=printed_img,
-        img_width=1200,
-        img_height=350,
-        font_size=70,
     )
 
-    print("\n[setup_all] === Generando imagen de test MANUSCRITA ===")
+    print("\n[setup_all] === Generando imagen de prueba MANUSCRITA ===")
     generate_handwritten_test_image(
-        text="Hola prueba OCR manuscrito",
+        text="Hola esto es una prueba de OCR manuscrito\nexamen IA",
         font_path=handwritten_font,
         out_path=handwritten_img,
-        img_width=1200,
-        img_height=400,
-        font_size=90,
     )
 
     return printed_img, handwritten_img

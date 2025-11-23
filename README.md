@@ -27,7 +27,9 @@ Ambos modos comparten pipeline:
 
 - ✅ Detectar **imágenes embebidas** y guardarlas recortadas  
   `--detect-images` → `output/<base>_images/`
-- ✅ Detectar **tablas** y generar una representación de tabla (imagen + plantilla Markdown)  
+- ✅ Detectar **tablas** y generar:
+  - imagen recortada de la tabla
+  - **archivo Markdown con la tabla y OCR automático por celda** (cuando es posible)  
   `--detect-tables` → `output/<base>_tables/`
 - ✅ Detectar **marcas/códigos** (barras, QR, tags) y guardarlos como imágenes independientes (sin interpretarlos)  
   `--detect-markers` → `output/<base>_markers/`
@@ -96,8 +98,15 @@ ocr_project/
 
   extras/
     detect_images.py    # detecta grandes regiones no textuales (imágenes)
-    detect_tables.py    # detecta tablas y genera imagen + .md
+    detect_tables.py    # detecta tablas y genera imagen + .md con OCR por celda
     detect_markers.py   # detecta marcas/códigos y los recorta
+
+  generators/
+    __init__.py
+    generate_test_image.py             # genera imágenes de texto impreso para pruebas
+    generate_handwritten_test_image.py # genera imágenes de texto manuscrito sintético
+    generate_handwritten_template.py   # genera plantilla para recopilar manuscrito real
+    generate_table_samples.py          # genera tablas de ejemplo (vacía + tabla del 5)
 
   data/
     fonts/              # fuentes .ttf/.otf/.ttc (impreso + manuscrito)
@@ -114,21 +123,12 @@ ocr_project/
   output/
     *.txt                      # resultados OCR
     *_images/                  # imágenes embebidas recortadas
-    *_tables/                  # tablas detectadas + plantillas Markdown
+    *_tables/                  # tablas detectadas + Markdown con OCR por celda
     *_markers/                 # marcas/códigos detectados
 
   docs/
     README.md
 ````
-
-Scripts adicionales en raíz:
-
-* `generate_test_image.py`
-  Genera imágenes de **texto impreso** para pruebas.
-* `generate_handwritten_test_image.py`
-  Genera imágenes de **texto manuscrito sintético** para pruebas.
-* `generate_handwritten_template.py`
-  Genera una plantilla para recopilar manuscrito real.
 
 ---
 
@@ -241,7 +241,7 @@ python -m training.generate_synthetic_handwritten \
 1. Generar plantilla:
 
    ```bash
-   python generate_handwritten_template.py \
+   python -m generators.generate_handwritten_template \
      --out data/raw_handwritten/plantilla_handwritten.png \
      --rows 8 \
      --cols 8
@@ -343,7 +343,7 @@ Genera:
 ### 9.1. Texto impreso
 
 ```bash
-python generate_test_image.py \
+python -m generators.generate_test_image \
   --text "HOLA ESTO ES UNA PRUEBA DE OCR IMPRESO" \
   --font data/fonts/FreeSans.ttf \
   --out data/samples/test_ocr_1.png \
@@ -355,7 +355,7 @@ python generate_test_image.py \
 ### 9.2. Texto manuscrito sintético
 
 ```bash
-python generate_handwritten_test_image.py \
+python -m generators.generate_handwritten_test_image \
   --text "Hola esto es una prueba de OCR manuscrito" \
   --font data/fonts/PatrickHand-Regular.ttf \
   --out data/samples/test_handwritten1.png \
@@ -363,6 +363,21 @@ python generate_handwritten_test_image.py \
   --height 450 \
   --font-size 90
 ```
+
+### 9.3. Tablas de ejemplo (vacía + tabla del 5)
+
+```bash
+python -m generators.generate_table_samples
+```
+
+Genera, por ejemplo:
+
+```text
+data/samples/tabla_multiplicar_5.png
+data/samples/tabla_vacia_5x5.png
+```
+
+Estas imágenes son ideales para probar la detección de tablas + OCR por celda.
 
 ---
 
@@ -419,7 +434,7 @@ Se generan:
   `output/doc_completo_tables/` con:
 
     * `doc_completo_table_XX.png` – imagen de la tabla.
-    * `doc_completo_table_XX.md` – plantilla Markdown donde podría volcarse el contenido OCR de cada celda.
+    * `doc_completo_table_XX.md` – tabla Markdown con contenido OCR automático por celda (si la rejilla se detecta correctamente; en caso contrario se deja como plantilla vacía con estructura).
 
 * **Marcas / códigos**
   `output/doc_completo_markers/` con regiones que parecen códigos de barras/QR/tags.
@@ -459,12 +474,18 @@ Se generan:
     * Inserción de espacios entre palabras y saltos de línea.
     * Generación de texto final en UTF-8.
 
+6. **Extras – `extras/*.py`**
+
+    * `detect_images` → grandes regiones no textuales.
+    * `detect_tables` → localización de tablas, recorte, división en celdas y OCR por celda.
+    * `detect_markers` → detección de regiones tipo códigos de barras/QR.
+
 ---
 
 ## 13. Limitaciones conocidas
 
 * Escritura manuscrita muy irregular, con letras muy pegadas o extremadamente estilizadas, puede degradar la tasa de acierto.
 * No se incluye corrector ortográfico ni modelo de lenguaje; las decisiones son puramente visuales.
-* Las tablas se detectan y se genera una estructura en Markdown asociada, pero no se realiza OCR por celda en esta versión.
+* El OCR por celda en tablas funciona muy bien con tablas generadas limpias (como las de `generate_table_samples`), pero en tablas complejas o con bordes poco definidos puede fallar parcialmente o cometer errores de caracter (`1 ↔ I`, `0 ↔ O`, etc.).
 
 ---

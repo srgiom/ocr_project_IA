@@ -61,11 +61,10 @@ Para que el OCR funcione correctamente se aplican las siguientes restricciones:
   - Sin deformaciones de perspectiva extremas.
 
 - **Texto impreso (`--mode printed`)**
-  - Fuentes legibles tipo Arial, FreeSans, etc.
+  - Fuentes legibles tipo PatrickHand-Regular, FreeSans, etc.
   - Tamaño de letra en rango aproximado [24, 120] píxeles de altura.
 
 - **Texto manuscrito (`--mode handwritten`)**
-  - Idealmente mayúsculas + dígitos (ver `HANDWRITTEN_CHARS` en `config.py`).
   - Trazos dentro de la zona central del documento (sin cortar caracteres en bordes).
   - Fondo blanco (folio escaneado, tablet con fondo claro).
 
@@ -413,7 +412,7 @@ Salida:
 
 ## 11. Extras opcionales: imágenes, tablas, marcas
 
-Ejemplo sobre un documento:
+### 11.1. Uso combinado de extras (se pueden usar todos a la vez)
 
 ```bash
 python main.py \
@@ -438,6 +437,36 @@ Se generan:
 
 * **Marcas / códigos**
   `output/doc_completo_markers/` con regiones que parecen códigos de barras/QR/tags.
+
+### 11.2. Detección de imágenes embebidas
+
+```bash
+python main.py \
+  --mode printed \
+  --input data/samples/doc_completo.png \
+  --out output/doc_completo_ocr.txt \
+  --detect-tables
+```
+
+### 11.3. Detección y OCR de tablas
+
+```bash
+python main.py \
+  --mode printed \
+  --input data/samples/doc_completo.png \
+  --out output/doc_completo_ocr.txt \
+  --detect-images
+```
+
+### 11.4. Detección de QRs
+
+```bash
+python main.py \
+  --mode printed \
+  --input data/samples/doc_completo.png \
+  --out output/doc_completo_ocr.txt \
+  --detect-markers
+```
 
 ---
 
@@ -485,7 +514,6 @@ Se generan:
 ## 13. Limitaciones conocidas
 
 * Escritura manuscrita muy irregular, con letras muy pegadas o extremadamente estilizadas, puede degradar la tasa de acierto.
-* No se incluye corrector ortográfico ni modelo de lenguaje; las decisiones son puramente visuales.
 * El OCR por celda en tablas funciona muy bien con tablas generadas limpias (como las de `generate_table_samples`), pero en tablas complejas o con bordes poco definidos puede fallar parcialmente o cometer errores de caracter (`1 ↔ I`, `0 ↔ O`, etc.).
 
 ---

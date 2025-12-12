@@ -2,7 +2,7 @@ import string
 from pathlib import Path
 
 # Caracteres soportados
-PRINTED_CHARS = string.ascii_uppercase + string.digits + ".,:;!?()/-'\" "
+PRINTED_CHARS = string.ascii_uppercase + string.ascii_lowercase + string.digits + ".,:;!?()/-'\" "
 
 HANDWRITTEN_CHARS = string.ascii_uppercase + string.digits + " "
 

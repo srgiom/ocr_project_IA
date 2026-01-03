@@ -125,8 +125,6 @@ ocr_project/
     *_tables/                  # tablas detectadas + Markdown con OCR por celda
     *_markers/                 # marcas/códigos detectados
 
-  docs/
-    README.md
 ````
 
 ---

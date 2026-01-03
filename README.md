@@ -443,7 +443,7 @@ python main.py \
   --mode printed \
   --input data/samples/doc_completo.png \
   --out output/doc_completo_ocr.txt \
-  --detect-tables
+  --detect-images
 ```
 
 ### 11.3. Detección y OCR de tablas
@@ -453,7 +453,7 @@ python main.py \
   --mode printed \
   --input data/samples/doc_completo.png \
   --out output/doc_completo_ocr.txt \
-  --detect-images
+  --detect-tables
 ```
 
 ### 11.4. Detección de QRs

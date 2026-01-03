@@ -21,7 +21,7 @@ def extract_label_from_filename(fname: str) -> str:
       - 'b_23.jpg'   -> 'B' (lo pasa a mayúscula)
       - '7_algo.png' -> '7'
     """
-    match = re.match(r"([A-Za-z0-9])", fname)
+    match = re.match(r"([A-Za-z0-9ñÑ])", fname)
     if not match:
         raise ValueError(f"No se pudo extraer letra de: {fname}")
     return match.group(1).upper()

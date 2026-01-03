@@ -40,10 +40,15 @@ Ambos modos comparten pipeline:
 
 - ❌ No se usa ningún motor OCR externo (Tesseract, EasyOCR, etc.).
 - ✅ Se usan únicamente:
-  - `opencv-python` – operaciones de imagen, componentes conectados, morfología…
-  - `numpy` – cálculo numérico.
-  - `Pillow` – generación de datasets y tests sintéticos.
-  - `scikit-learn` – modelos KNN / LinearSVC.
+  - `opencv-python` – operaciones de visión por computador clásica
+    (binarización, morfología, componentes conectados, segmentación),
+    sin utilizar módulos OCR ni detección de texto de alto nivel.
+  - `numpy` – cálculo numérico y gestión de matrices, vectores de características
+    y datasets de entrenamiento.
+  - `Pillow` – generación de imágenes y datasets sintéticos a partir de fuentes
+    tipográficas, así como creación de imágenes de prueba.
+  - `scikit-learn` – implementación de clasificadores clásicos (KNN y LinearSVC)
+    entrenados desde cero sobre descriptores HOG.
 
 ---
 

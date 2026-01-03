@@ -46,7 +46,7 @@ Ambos modos comparten pipeline:
   - `numpy` – cálculo numérico y gestión de matrices, vectores de características
     y datasets de entrenamiento.
   - `Pillow` – generación de imágenes y datasets sintéticos a partir de fuentes
-    tipográficas (.tff), así como creación de imágenes de prueba.
+    tipográficas (.ttf), así como creación de imágenes de prueba.
   - `scikit-learn` – implementación de clasificadores clásicos (KNN y LinearSVC)
     entrenados desde cero sobre descriptores HOG.
 

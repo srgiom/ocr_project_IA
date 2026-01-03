@@ -70,7 +70,48 @@ Para que el OCR funcione correctamente se aplican las siguientes restricciones:
 
 ---
 
-## 3. Estructura del proyecto
+## 3. Pipeline interno (resumen técnico)
+
+1. **Preprocesado – `core/preprocessing.py`**
+
+    * Convertir BGR → escala de grises.
+    * Suavizado gaussiano.
+    * Binarización adaptativa inversa (fondo = 0, texto = 255).
+    * Morfología para limpiar ruido.
+
+2. **Segmentación – `core/segmentation.py`**
+
+    * Componentes conectados (`connectedComponentsWithStats`).
+    * Agrupación en líneas por coordenada vertical.
+    * División en palabras usando gaps horizontales.
+    * Recorte de cada carácter y normalización a `CHAR_SIZE`.
+
+3. **Características – `core/features.py`**
+
+    * Gradientes Sobel.
+    * HOG casero por celdas y bloques.
+    * Vector de características fijo por carácter.
+
+4. **Clasificación – `core/classifier.py`**
+
+    * KNN o LinearSVC sobre vectores HOG.
+    * `OCRModel` mapea índices de clase ↔ caracteres (`PRINTED_CHARS` / `HANDWRITTEN_CHARS`).
+
+5. **Reconstrucción – `core/postprocess.py`**
+
+    * Orden por `(line_idx, word_idx, char_idx)`.
+    * Inserción de espacios entre palabras y saltos de línea.
+    * Generación de texto final en UTF-8.
+
+6. **Extras – `extras/*.py`**
+
+    * `detect_images` → grandes regiones no textuales.
+    * `detect_tables` → localización de tablas, recorte, división en celdas y OCR por celda.
+    * `detect_markers` → detección de regiones tipo códigos de barras/QR.
+
+---
+
+## 4. Estructura del proyecto
 
 ```text
 ocr_project/
@@ -129,9 +170,9 @@ ocr_project/
 
 ---
 
-## 4. Puesta en marcha desde cero
+## 5. Puesta en marcha desde cero
 
-### 4.1. Crear entorno virtual e instalar dependencias
+### 5.1. Crear entorno virtual e instalar dependencias
 
 ```bash
 cd ocr_project
@@ -145,7 +186,7 @@ pip install -r requirements.txt
 
 ---
 
-## 5. Preparar fuentes
+## 6. Preparar fuentes
 
 Se necesitan, como mínimo:
 
@@ -167,7 +208,7 @@ cp "/System/Library/Fonts/Arial.ttf" data/fonts/
 
 ---
 
-## 6. Setup automático recomendado (`setup_all.py`)
+## 7. Setup automático recomendado (`setup_all.py`)
 
 La forma más rápida de dejar el proyecto listo es usar el script de setup:
 
@@ -213,9 +254,9 @@ Después de ejecutar `setup_all.py` el proyecto queda listo para usar con tus pr
 
 ---
 
-## 7. Uso manual de datasets (por si se quiere controlar todo a mano)
+## 8. Uso manual de datasets (por si se quiere controlar todo a mano)
 
-### 7.1. Dataset impreso sintético
+### 8.1. Dataset impreso sintético
 
 ```bash
 python -m training.generate_synthetic \
@@ -224,7 +265,7 @@ python -m training.generate_synthetic \
   --samples-per-char 50
 ```
 
-### 7.2. Dataset manuscrito sintético
+### 8.2. Dataset manuscrito sintético
 
 ```bash
 python -m training.generate_synthetic_handwritten \
@@ -233,7 +274,7 @@ python -m training.generate_synthetic_handwritten \
   --samples-per-char 80
 ```
 
-### 7.3. Dataset manuscrito REAL desde plantillas escaneadas (opcional)
+### 8.3. Dataset manuscrito REAL desde plantillas escaneadas (opcional)
 
 1. Generar plantilla:
 
@@ -256,7 +297,7 @@ python -m training.generate_synthetic_handwritten \
      --cols 8
    ```
 
-### 7.4. Dataset manuscrito REAL desde imágenes sueltas A_nombre.png
+### 8.4. Dataset manuscrito REAL desde imágenes sueltas A_nombre.png
 
 Si tienes un dataset manual ya recortado, p.ej.:
 
@@ -285,7 +326,7 @@ python -m training.build_handwritten_from_images \
   --out data/processed/handwritten_from_images.npz
 ```
 
-### 7.5. Fusión sintético + real (opcional, si se hace manual)
+### 8.5. Fusión sintético + real (opcional, si se hace manual)
 
 Ejemplo de fusión manual desde Python (si no se usa `setup_all.py`):
 
@@ -308,7 +349,7 @@ EOF
 
 ---
 
-## 8. Entrenamiento de modelos
+## 9. Entrenamiento de modelos
 
 Con los datasets listos (sintético o fusionado):
 
@@ -335,9 +376,9 @@ Genera:
 
 ---
 
-## 9. Generar imágenes de prueba
+## 10. Generar imágenes de prueba
 
-### 9.1. Texto impreso
+### 10.1. Texto impreso
 
 ```bash
 python -m generators.generate_test_image \
@@ -349,7 +390,7 @@ python -m generators.generate_test_image \
   --font-size 72
 ```
 
-### 9.2. Texto manuscrito sintético
+### 10.2. Texto manuscrito sintético
 
 ```bash
 python -m generators.generate_handwritten_test_image \
@@ -361,7 +402,7 @@ python -m generators.generate_handwritten_test_image \
   --font-size 90
 ```
 
-### 9.3. Tablas de ejemplo (vacía + tabla del 5)
+### 10.3. Tablas de ejemplo (vacía + tabla del 5)
 
 ```bash
 python -m generators.generate_table_samples
@@ -378,9 +419,9 @@ Estas imágenes son ideales para probar la detección de tablas + OCR por celda.
 
 ---
 
-## 10. Ejecución del OCR
+## 11. Ejecución del OCR
 
-### 10.1. OCR texto impreso
+### 11.1. OCR texto impreso
 
 ```bash
 python main.py \
@@ -393,7 +434,7 @@ Salida:
 
 * `output/test_ocr_1.txt`
 
-### 10.2. OCR texto manuscrito
+### 11.2. OCR texto manuscrito
 
 ```bash
 python main.py \
@@ -408,9 +449,9 @@ Salida:
 
 ---
 
-## 11. Extras opcionales: imágenes, tablas, marcas
+## 12. Extras opcionales: imágenes, tablas, marcas
 
-### 11.1. Uso combinado de extras (se pueden usar todos a la vez)
+### 12.1. Uso combinado de extras (se pueden usar todos a la vez)
 
 ```bash
 python main.py \
@@ -436,7 +477,7 @@ Se generan:
 * **Marcas / códigos**
   `output/doc_completo_markers/` con regiones que parecen códigos de barras/QR/tags.
 
-### 11.2. Detección de imágenes embebidas
+### 12.2. Detección de imágenes embebidas
 
 ```bash
 python main.py \
@@ -446,7 +487,7 @@ python main.py \
   --detect-images
 ```
 
-### 11.3. Detección y OCR de tablas
+### 12.3. Detección y OCR de tablas
 
 ```bash
 python main.py \
@@ -456,7 +497,7 @@ python main.py \
   --detect-tables
 ```
 
-### 11.4. Detección de QRs
+### 12.4. Detección de QRs
 
 ```bash
 python main.py \
@@ -465,47 +506,6 @@ python main.py \
   --out output/doc_completo_ocr.txt \
   --detect-markers
 ```
-
----
-
-## 12. Pipeline interno (resumen técnico)
-
-1. **Preprocesado – `core/preprocessing.py`**
-
-    * Convertir BGR → escala de grises.
-    * Suavizado gaussiano.
-    * Binarización adaptativa inversa (fondo = 0, texto = 255).
-    * Morfología para limpiar ruido.
-
-2. **Segmentación – `core/segmentation.py`**
-
-    * Componentes conectados (`connectedComponentsWithStats`).
-    * Agrupación en líneas por coordenada vertical.
-    * División en palabras usando gaps horizontales.
-    * Recorte de cada carácter y normalización a `CHAR_SIZE`.
-
-3. **Características – `core/features.py`**
-
-    * Gradientes Sobel.
-    * HOG casero por celdas y bloques.
-    * Vector de características fijo por carácter.
-
-4. **Clasificación – `core/classifier.py`**
-
-    * KNN o LinearSVC sobre vectores HOG.
-    * `OCRModel` mapea índices de clase ↔ caracteres (`PRINTED_CHARS` / `HANDWRITTEN_CHARS`).
-
-5. **Reconstrucción – `core/postprocess.py`**
-
-    * Orden por `(line_idx, word_idx, char_idx)`.
-    * Inserción de espacios entre palabras y saltos de línea.
-    * Generación de texto final en UTF-8.
-
-6. **Extras – `extras/*.py`**
-
-    * `detect_images` → grandes regiones no textuales.
-    * `detect_tables` → localización de tablas, recorte, división en celdas y OCR por celda.
-    * `detect_markers` → detección de regiones tipo códigos de barras/QR.
 
 ---
 

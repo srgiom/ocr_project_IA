@@ -2,9 +2,9 @@ import string
 from pathlib import Path
 
 # Caracteres soportados
-PRINTED_CHARS = string.ascii_uppercase + string.ascii_lowercase + string.digits + ".,:;!?()/-'\" "
+PRINTED_CHARS = string.ascii_uppercase + string.ascii_lowercase + "ñÑ" + string.digits + ".,:;!?()/-'\" "
 
-HANDWRITTEN_CHARS = string.ascii_uppercase + string.digits + " "
+HANDWRITTEN_CHARS = string.ascii_uppercase + "ñÑ" + string.digits + " "
 
 # Tamaño normalizado de cada carácter
 CHAR_SIZE = (32, 32)

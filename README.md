@@ -517,7 +517,10 @@ python main.py \
 
 ## 13. Limitaciones conocidas
 
-* Escritura manuscrita muy irregular, con letras muy pegadas o extremadamente estilizadas, puede degradar la tasa de acierto.
-* El OCR por celda en tablas funciona muy bien con tablas generadas limpias (como las de `generate_table_samples`), pero en tablas complejas o con bordes poco definidos puede fallar parcialmente o cometer errores de caracter (`1 ↔ I`, `0 ↔ O`, etc.).
+- La escritura manuscrita muy irregular, con letras muy pegadas o extremadamente estilizadas, puede degradar la tasa de acierto.
+
+- El reconocimiento manuscrito se realiza carácter a carácter. Este enfoque presenta limitaciones cuando las letras están conectadas o escritas de forma cursiva continua, como ocurre en manuscrito natural. En estos casos, la segmentación basada en componentes conectados no permite aislar correctamente cada carácter, lo que degrada el reconocimiento.
+
+- El OCR por celda en tablas funciona muy bien con tablas generadas limpias (como las de `generate_table_samples`), pero en tablas complejas o con bordes poco definidos puede fallar parcialmente o cometer errores de caracter (`1 ↔ I`, `0 ↔ O`, etc.).
 
 ---
